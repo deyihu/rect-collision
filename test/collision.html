@@ -9,6 +9,10 @@
         margin: 0px;
         height: 100%;
         width: 100%;
+
+    }
+
+    .container {
         display: flex;
     }
 
@@ -20,17 +24,20 @@
 <script type="text/javascript" src="./../dist/rect-collision.js"></script>
 
 <body>
+    <h1> 500000 bbox collides test</h1>
     <div class="container">
-        <div id="panel1" class="panel">
-            <div class="info">rect-collision</div>
+        <div class="">
+            <div id="panel1" class="panel">
+                <div class="info">rect-collision</div>
+            </div>
+            <div id="panel2" class="panel">
+                <div class="info">rbush</div>
+            </div>
         </div>
-        <div id="panel2" class="panel">
-            <div class="info">rbush</div>
+        <div>
+            <button onclick="test()"> collides test</button>
+            open F12 to view run time
         </div>
-    </div>
-    <div>
-        <button onclick="test()"> collides test</button>
-        open F12 to View Run Time
     </div>
 
     <script>
