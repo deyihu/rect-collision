@@ -1,3 +1,3 @@
 # rect-collision
 
-[collides test](https://deyihu.github.io/rect-collision/test/collision.html)
+[collides test](https://deyihu.github.io/rect-collision/test/collides.html)
