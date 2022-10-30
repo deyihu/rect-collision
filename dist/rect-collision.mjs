@@ -70,10 +70,10 @@ var RectCollision = /*#__PURE__*/function () {
     if (!item) {
       return this;
     }
-    if (item._gridIndex) {
+    if (item._insert) {
       return this;
     }
-    item._gridIndex = [];
+    item._insert = true;
     var minX = item.minX,
       minY = item.minY,
       maxX = item.maxX,
@@ -94,34 +94,35 @@ var RectCollision = /*#__PURE__*/function () {
           });
         }
         gridIndex.get(index).items.push(item);
-        item._gridIndex.push(index);
       }
     }
-  };
-  _proto.remove = function remove(item) {
-    if (!item) {
-      return this;
-    }
-    var gridIndex = item._gridIndex;
-    if (!gridIndex || !gridIndex.length) {
-      delete item._gridIndex;
-      return this;
-    }
-    for (var i = 0, len = gridIndex.length; i < len; i++) {
-      var index = gridIndex[i];
-      var grid = this.gridIndex.get(index);
-      if (!grid) {
-        continue;
-      }
-      var items = grid.items;
-      var idx = items.indexOf(item);
-      if (idx > -1) {
-        item.splice(idx, 1);
-      }
-    }
-    delete item._gridIndex;
-    return this;
-  };
+  }
+
+  // remove(item) {
+  //     if (!item) {
+  //         return this;
+  //     }
+  //     const gridIndex = item._gridIndex;
+  //     if (!gridIndex || !gridIndex.length) {
+  //         delete item._gridIndex;
+  //         return this;
+  //     }
+  //     for (let i = 0, len = gridIndex.length; i < len; i++) {
+  //         const index = gridIndex[i];
+  //         const grid = this.gridIndex.get(index);
+  //         if (!grid) {
+  //             continue;
+  //         }
+  //         const items = grid.items;
+  //         const idx = items.indexOf(item);
+  //         if (idx > -1) {
+  //             item.splice(idx, 1);
+  //         }
+  //     }
+  //     delete item._gridIndex;
+  //     return this;
+  // }
+  ;
   _proto.collides = function collides(item) {
     if (!item) {
       return false;
@@ -161,7 +162,7 @@ var RectCollision = /*#__PURE__*/function () {
       var index = _step.value;
       var items = index[1].items;
       for (var i = 0, len = items.length; i < len; i++) {
-        delete items[i]._gridIndex;
+        delete items[i]._insert;
       }
       index[1].items = [];
     }
