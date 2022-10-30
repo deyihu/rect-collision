@@ -19,6 +19,9 @@
     .panel {
         margin-bottom: 100px;
     }
+    canvas{
+        border: 1px dashed gray;
+    }
 </style>
 <script type="text/javascript" src="https://unpkg.com/rbush@3.0.1/rbush.min.js"></script>
 <script type="text/javascript" src="./../dist/rect-collision.js"></script>
@@ -44,7 +47,7 @@
         const { GRIDWIDTH, GRIDHEIGHT } = rectcollision;
 
         function createCanvas() {
-            const width = 1000, height = 400;
+            const width = 1100, height = 450;
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
@@ -91,7 +94,7 @@
             const items = [];
             const round = Math.round;
             for (let i = 0; i < 500000; i++) {
-                const minX = round(Math.random() * 900);
+                const minX = round(Math.random() * 950);
                 const maxX = round(minX + Math.random() * 100 + 20);
                 const minY = round(Math.random() * 340);
                 const maxY = round(minY + Math.random() * 60 + 10);
