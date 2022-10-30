@@ -83,7 +83,7 @@
         function draw(canvas, items) {
             const ctx = canvas.getContext('2d');
             ctx.strokeStyle = 'black';
-            ctx.lineWidth = 0.5;
+            ctx.lineWidth = 0.2;
             for (let i = 0, len = items.length; i < len; i++) {
                 const { minX, minY, maxX, maxY } = items[i];
                 ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
