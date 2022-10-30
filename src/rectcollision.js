@@ -38,10 +38,10 @@ export class RectCollision {
         if (!item) {
             return this;
         }
-        if (item._gridIndex) {
+        if (item._insert) {
             return this;
         }
-        item._gridIndex = [];
+        item._insert = true;
         const { minX, minY, maxX, maxY } = item;
         const minCol = Math.floor(minX / GRIDWIDTH), maxCol = Math.ceil(maxX / GRIDWIDTH), minRow = Math.floor(minY / GRIDHEIGHT), maxRow = Math.ceil(maxY / GRIDHEIGHT);
         const gridIndex = this.gridIndex;
@@ -56,35 +56,34 @@ export class RectCollision {
                     });
                 }
                 gridIndex.get(index).items.push(item);
-                item._gridIndex.push(index);
             }
         }
     }
 
-    remove(item) {
-        if (!item) {
-            return this;
-        }
-        const gridIndex = item._gridIndex;
-        if (!gridIndex || !gridIndex.length) {
-            delete item._gridIndex;
-            return this;
-        }
-        for (let i = 0, len = gridIndex.length; i < len; i++) {
-            const index = gridIndex[i];
-            const grid = this.gridIndex.get(index);
-            if (!grid) {
-                continue;
-            }
-            const items = grid.items;
-            const idx = items.indexOf(item);
-            if (idx > -1) {
-                item.splice(idx, 1);
-            }
-        }
-        delete item._gridIndex;
-        return this;
-    }
+    // remove(item) {
+    //     if (!item) {
+    //         return this;
+    //     }
+    //     const gridIndex = item._gridIndex;
+    //     if (!gridIndex || !gridIndex.length) {
+    //         delete item._gridIndex;
+    //         return this;
+    //     }
+    //     for (let i = 0, len = gridIndex.length; i < len; i++) {
+    //         const index = gridIndex[i];
+    //         const grid = this.gridIndex.get(index);
+    //         if (!grid) {
+    //             continue;
+    //         }
+    //         const items = grid.items;
+    //         const idx = items.indexOf(item);
+    //         if (idx > -1) {
+    //             item.splice(idx, 1);
+    //         }
+    //     }
+    //     delete item._gridIndex;
+    //     return this;
+    // }
 
     collides(item) {
         if (!item) {
@@ -119,10 +118,9 @@ export class RectCollision {
         for (const index of this.gridIndex) {
             const items = index[1].items;
             for (let i = 0, len = items.length; i < len; i++) {
-                delete items[i]._gridIndex;
+                delete items[i]._insert;
             }
             index[1].items = [];
-
         }
         return this;
     }
