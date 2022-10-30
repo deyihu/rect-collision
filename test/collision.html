@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>collides test</title>
+<style type="text/css">
+    html,
+    body {
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+        display: flex;
+    }
+
+    .panel {
+        margin-bottom: 100px;
+    }
+</style>
+<script type="text/javascript" src="https://unpkg.com/rbush@3.0.1/rbush.min.js"></script>
+<script type="text/javascript" src="./../dist/rect-collision.js"></script>
+
+<body>
+    <div class="container">
+        <div id="panel1" class="panel">
+            <div class="info">rect-collision</div>
+        </div>
+        <div id="panel2" class="panel">
+            <div class="info">rbush</div>
+        </div>
+    </div>
+    <div>
+        <button onclick="test()"> collides test</button>
+        open F12 to View Run Time
+    </div>
+
+    <script>
+        const { GRIDWIDTH, GRIDHEIGHT } = rectcollision;
+
+        function createCanvas() {
+            const width = 1000, height = 400;
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            canvas.style.cssText = `width:${width}px;height:${height}px`;
+            return canvas;
+
+        }
+
+        const canvas = createCanvas();
+        document.querySelector('#panel1').appendChild(canvas);
+        const canvas1 = createCanvas();
+        document.querySelector('#panel2').appendChild(canvas1);
+
+
+        function clear(canvasList) {
+            canvasList.forEach(canvas => {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+        }
+
+        function drawTile(canvas, gridIndex) {
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 0.1;
+            for (const index of gridIndex) {
+                const { col, row } = index[1];
+                ctx.strokeRect(col * GRIDWIDTH, row * GRIDHEIGHT, GRIDWIDTH, GRIDHEIGHT);
+            }
+        }
+
+
+        function draw(canvas, items) {
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 0.5;
+            for (let i = 0, len = items.length; i < len; i++) {
+                const { minX, minY, maxX, maxY } = items[i];
+                ctx.strokeRect(minX, minY, maxX - minX, maxY - minY);
+            }
+        }
+
+        function getTestItems() {
+            const items = [];
+            const round = Math.round;
+            for (let i = 0; i < 500000; i++) {
+                const minX = round(Math.random() * 900);
+                const maxX = round(minX + Math.random() * 100 + 20);
+                const minY = round(Math.random() * 340);
+                const maxY = round(minY + Math.random() * 60 + 10);
+                items.push({ minX, minY, maxX, maxY });
+            }
+            return items;
+        }
+
+        function getTime() {
+            return new Date().getTime();
+        }
+
+        const rectC = new rectcollision.RectCollision();
+        const rbush = new RBush();
+
+        function test() {
+            clear([canvas, canvas1]);
+            const items = getTestItems();
+
+            const time1 = 'rbush collides time';
+            console.time(time1);
+            rbush.clear();
+            for (let i = 0, len = items.length; i < len; i++) {
+                if (!rbush.collides(items[i])) {
+                    rbush.insert(items[i]);
+                }
+            }
+            console.timeEnd(time1);
+
+            const time = 'collides time';
+            console.time(time);
+            rectC.clear();
+            for (let i = 0, len = items.length; i < len; i++) {
+                if (!rectC.collides(items[i])) {
+                    rectC.insert(items[i]);
+                }
+            }
+            console.timeEnd(time);
+
+
+
+            drawTile(canvas, rectC.gridIndex);
+            draw(canvas, rectC.all());
+            draw(canvas1, rbush.all());
+        }
+
+        test();
+
+    </script>
+</body>
+
+</html>
