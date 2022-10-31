@@ -3,10 +3,7 @@ export const GRIDWIDTH = 100;
 export const GRIDHEIGHT = 50;
 
 function bboxCross(bbox1, bbox2) {
-    if (bbox1.maxX < bbox2.minX || bbox1.minY > bbox2.maxY || bbox1.minX > bbox2.maxX || bbox1.maxY < bbox2.minY) {
-        return false;
-    }
-    return true;
+    return !(bbox1.maxX < bbox2.minX || bbox1.minY > bbox2.maxY || bbox1.minX > bbox2.maxX || bbox1.maxY < bbox2.minY);
 }
 
 // function getItemColRow(item) {
@@ -18,6 +15,7 @@ function bboxCross(bbox1, bbox2) {
 export class RectCollision {
     constructor() {
         this.gridIndex = new Map();
+        this.items = [];
         this.init();
     }
 
@@ -27,7 +25,7 @@ export class RectCollision {
                 const grid = {
                     col,
                     row,
-                    items: []
+                    index: []
                 };
                 this.gridIndex.set(`${col}_${row}`, grid);
             }
@@ -45,17 +43,22 @@ export class RectCollision {
         const { minX, minY, maxX, maxY } = item;
         const minCol = Math.floor(minX / GRIDWIDTH), maxCol = Math.ceil(maxX / GRIDWIDTH), minRow = Math.floor(minY / GRIDHEIGHT), maxRow = Math.ceil(maxY / GRIDHEIGHT);
         const gridIndex = this.gridIndex;
+        const len = this.items.push(item);
+        let row = minRow;
         for (let col = minCol; col <= maxCol; col++) {
-            for (let row = minRow; row <= maxRow; row++) {
+            row = minRow;
+            for (; row <= maxRow; row++) {
                 const index = `${col}_${row}`;
-                if (!gridIndex.has(index)) {
-                    gridIndex.set(index, {
-                        col,
-                        row,
-                        items: []
-                    });
+                if (col < -10 || col > 20 || row < -10 || row > 20) {
+                    if (!gridIndex.has(index)) {
+                        gridIndex.set(index, {
+                            col,
+                            row,
+                            index: []
+                        });
+                    }
                 }
-                gridIndex.get(index).items.push(item);
+                gridIndex.get(index).index.push(len - 1);
             }
         }
     }
@@ -93,19 +96,22 @@ export class RectCollision {
         const minCol = Math.floor(minX / GRIDWIDTH), maxCol = Math.ceil(maxX / GRIDWIDTH), minRow = Math.floor(minY / GRIDHEIGHT), maxRow = Math.ceil(maxY / GRIDHEIGHT);
         const cross = bboxCross;
         const gridIndex = this.gridIndex;
+        let row = minRow;
         for (let col = minCol; col <= maxCol; col++) {
-            for (let row = minRow; row <= maxRow; row++) {
-                const index = `${col}_${row}`;
-                const grid = gridIndex.get(index);
+            row = minRow;
+            for (; row <= maxRow; row++) {
+                const gridIdx = `${col}_${row}`;
+                const grid = gridIndex.get(gridIdx);
                 if (!grid) {
                     continue;
                 }
-                const items = grid.items;
-                if (!items.length) {
+                const index = grid.index;
+                if (!index.length) {
                     continue;
                 }
-                for (let i = 0, len = items.length; i < len; i++) {
-                    if (cross(item, items[i])) {
+                for (let i = 0, len = index.length; i < len; i++) {
+                    const idx = index[i];
+                    if (cross(item, this.items[idx])) {
                         return true;
                     }
                 }
@@ -115,30 +121,31 @@ export class RectCollision {
     }
 
     clear() {
-        for (const index of this.gridIndex) {
-            const items = index[1].items;
-            for (let i = 0, len = items.length; i < len; i++) {
-                delete items[i]._insert;
-            }
-            index[1].items = [];
+        for (const gIndex of this.gridIndex) {
+            gIndex[1].index = [];
         }
+        for (let i = 0, len = this.items.length; i < len; i++) {
+            delete this.items[i]._insert;
+        }
+        this.items = [];
         return this;
     }
 
     all() {
-        const result = [];
-        for (const index of this.gridIndex) {
-            const items = index[1].items;
-            if (!items || !items.length) {
-                continue;
-            }
-            for (let i = 0, len = items.length; i < len; i++) {
-                const item = items[i];
-                if (result.indexOf(item) === -1) {
-                    result.push(item);
-                }
-            }
-        }
-        return result;
+        return this.items;
+        // const result = [];
+        // for (const index of this.gridIndex) {
+        //     const items = index[1].items;
+        //     if (!items || !items.length) {
+        //         continue;
+        //     }
+        //     for (let i = 0, len = items.length; i < len; i++) {
+        //         const item = items[i];
+        //         if (result.indexOf(item) === -1) {
+        //             result.push(item);
+        //         }
+        //     }
+        // }
+        // return result;
     }
 }
